@@ -1,0 +1,300 @@
+# Portal Scanner Configuration — events, experiential & hospitality search (UK)
+# Built from templates/portals.example.yml with every tech company removed.
+#
+# How the scanner covers these employers:
+#   - Entries whose careers_url is an ATS board (Greenhouse, Workable, Teamtailor,
+#     Workday, SmartRecruiters, iCIMS) are read by the zero-token scanner
+#     (`npm run scan` / `node scan.mjs`).
+#   - Entries with a branded careers page are opened in the browser by the agent
+#     scan (`/career-ops scan` in Claude Code).
+#   - Entries with scan_method: websearch are found through web search.
+#   - search_queries at the bottom sweep UK events job boards and recruiters.
+# Every careers URL here was checked on 2026-10-15.
+
+# Previously seen postings come back after 30 days, so re-listed roles resurface.
+scan_history:
+  recheck_after_days: 30
+
+# -- Title filter --
+# A title must contain at least one positive keyword and no negative keyword
+# (case-insensitive). " + " means all terms must appear, in any order.
+title_filter:
+  positive:
+    # -- Events --
+    - "stem:Event"       # Event, Events, Eventing — but not "Prevention"
+    - "Conference"
+    - "Exhibition"
+    - "Festival"
+    - "stem:Venue"       # not "Revenue"
+    - "Live Experience"
+    - "Production Assistant"
+    - "Production Coordinator"
+    - "Production Executive"
+    - "Production Manager"
+    - "Producer"
+    # -- Experiential / brand activation --
+    - "Experiential"
+    - "Activation"
+    - "Brand Experience"
+    - "Brand Ambassador"
+    - "Brand Partnerships"
+    - "Sponsorship"
+    - "Partnerships Executive"
+    - "Partnerships Coordinator"
+    - "Account Executive"
+    - "Account Coordinator"
+    - "Account Manager"
+    - "Campaign Executive"
+    - "Campaign Coordinator"
+    - "Marketing Executive"
+    - "Marketing Coordinator"
+    - "Marketing Assistant"
+    # -- Hospitality --
+    - "Hospitality"
+    - "Guest Experience"
+    - "Front of House"
+    - "Sales + Events"
+    - "Operations + Event"
+    - "Operations Coordinator"
+    - "Operations Executive"
+    - "Operations Assistant"
+    # -- Project coordination --
+    - "Project Coordinator"
+    - "Project Executive"
+    - "Project Assistant"
+    # -- Early careers --
+    - "Graduate"
+    - "Placement"
+    - "Junior + Event"
+  negative:
+    # -- Too senior for now --
+    - "Director"
+    - "Head of"
+    - "word:VP"
+    - "Vice President"
+    - "Chief"
+    # -- Kitchen and back-of-house roles on catering boards --
+    - "Chef"
+    - "Kitchen"
+    - "Pastry"
+    - "Cleaner"
+    - "Cleaning"
+    # -- Unrelated functions that share keywords --
+    - "Accounts Payable"
+    - "Accounts Receivable"
+    - "Payroll"
+    - "Software"
+    - "Engineer"
+    - "Developer"
+    - "Pharmaceutical"
+    - "Medical Science"
+    - "Field Sales"
+    - "Security Officer"
+    - "Steward"
+  seniority_boost:
+    - "Junior"
+    - "Assistant"
+    - "Coordinator"
+    - "Executive"
+    - "Graduate"
+
+# -- Location filter --
+# UK only. A posting must name one of the `allow` places; anything else
+# (US, Middle East, etc.) is dropped. Postings with no location still pass,
+# and a title that says Remote is still let through.
+location_filter:
+  always_allow:
+    - "London"
+    - "United Kingdom"
+  allow:
+    - "London"
+    - "United Kingdom"
+    - "UK"
+    - "GBR"
+    - "England"
+    - "Manchester"
+    - "Birmingham"
+    - "Leeds"
+    - "Bristol"
+    - "Brighton"
+    - "Liverpool"
+    - "Edinburgh"
+    - "Glasgow"
+    - "Norwich"
+    - "Coventry"
+  block_hard:
+    - "United States"
+    - "USA"
+    - "Canada"
+    - "Saudi Arabia"
+    - "Riyadh"
+    - "United Arab Emirates"
+    - "Abu Dhabi"
+    - "Dubai"
+    - "Australia"
+
+# -- Web search queries (UK events job boards and specialist recruiters) --
+# These run in the agent scan. Search results can lag the live listing,
+# so every hit is checked against the employer before it is evaluated.
+search_queries:
+  - name: Live Recruitment — events & experiential (London)
+    query: 'site:live-recruitment.co.uk/job "Event" OR "Experiential" OR "Account Executive" London'
+    enabled: true
+
+  - name: Major Players — experiential agency roles
+    query: 'site:majorplayers.co.uk/job "Experiential" OR "Event" OR "Activation"'
+    enabled: true
+
+  - name: DNA Recruit — experiential & events
+    query: 'site:dnarecruit.com "Experiential" OR "Event Coordinator" OR "Account Executive" London'
+    enabled: true
+
+  - name: Caterer.com — events & hospitality (London)
+    query: 'site:caterer.com "Events Coordinator" OR "Events Executive" OR "Events Assistant" OR "Event Sales" London'
+    enabled: true
+
+  - name: Hosco — events & hospitality (UK)
+    query: 'site:hosco.com "Event" OR "Guest Experience" London'
+    enabled: true
+
+  - name: Bright Network — graduate events & experiential
+    query: 'site:brightnetwork.co.uk/graduate-jobs "Event" OR "Experiential" OR "Account Executive" London'
+    enabled: true
+
+  - name: Built In London — events roles
+    query: 'site:builtinlondon.uk/job "Events Coordinator" OR "Events Executive" OR "Event Producer" OR "Experiential"'
+    enabled: true
+
+  - name: Find a Job (DWP) — events roles in London
+    query: 'site:findajob.dwp.gov.uk "Events Coordinator" OR "Events Assistant" OR "Event Executive" London'
+    enabled: true
+
+  - name: ATS boards — experiential & events in London
+    query: 'site:job-boards.greenhouse.io OR site:apply.workable.com OR site:teamtailor.com "Experiential" OR "Event Coordinator" OR "Event Producer" London'
+    enabled: true
+
+# -- Tracked employers --
+tracked_companies:
+
+  # -- Experiential & brand activation agencies --
+
+  - name: On Board Experiential (OBE)
+    careers_url: https://job-boards.greenhouse.io/obexp
+    api: https://boards-api.greenhouse.io/v1/boards/obexp/jobs
+    notes: "Experiential agency. London freelance event producer roles alongside US roles."
+    enabled: true
+
+  - name: Momentum Worldwide
+    careers_url: https://apply.workable.com/momentum-worldwide/
+    notes: "Experiential and brand experience agency with a London office."
+    enabled: true
+
+  - name: DRPG
+    careers_url: https://drpg.teamtailor.com/
+    notes: "Events, live experiences and video production group."
+    enabled: true
+
+  - name: Emota (Inizio Engage)
+    careers_url: https://job-boards.greenhouse.io/xdinizioengage
+    api: https://boards-api.greenhouse.io/v1/boards/xdinizioengage/jobs
+    notes: "Event producer roles in London/Manchester. Shared board with Inizio's healthcare sales roles, which the title filter drops."
+    enabled: true
+
+  - name: Jack Morton
+    careers_url: https://jackmorton.com/culture-careers/
+    notes: "Brand experience agency. Branded careers page, agent scan only."
+    enabled: true
+
+  - name: George P. Johnson (GPJ UK)
+    careers_url: https://www.gpj.co.uk/who-we-are/careers/
+    notes: "Experiential and event marketing agency. Branded careers page, agent scan only."
+    enabled: true
+
+  - name: Imagination
+    careers_url: https://imagination.com/careers/
+    notes: "Brand experience agency, London HQ. Branded careers page, agent scan only."
+    enabled: true
+
+  - name: TRO
+    careers_url: https://www.tro.com/join-us/
+    notes: "Experiential agency with London, Manchester and Norwich offices. Branded page, agent scan only."
+    enabled: true
+
+  # -- Sports, entertainment & live events --
+
+  - name: Wasserman
+    careers_url: https://teamwass.wd5.myworkdayjobs.com/wassermancareers
+    notes: "Sports and entertainment marketing, experiential and hospitality. London office (Aldwych)."
+    enabled: true
+
+  - name: Live Nation
+    careers_url: https://livenation.wd503.myworkdayjobs.com/LNExternalSite
+    notes: "Concerts, festivals and venues. International Workday board."
+    enabled: true
+
+  - name: Oak View Group UK
+    careers_url: https://careers-ovguk.icims.com/jobs/search?ss=1
+    notes: "Venues and hospitality (Co-op Live and others). iCIMS board."
+    enabled: true
+
+  - name: AEG Europe
+    careers_url: https://www.aegeurope.com/careers
+    scan_method: websearch
+    scan_query: '"AEG" "The O2" jobs London events OR hospitality'
+    notes: "The O2 and AEG Presents. No readable job board found yet, so found by web search."
+    enabled: true
+
+  - name: Broadwick Live
+    careers_url: https://builtinlondon.uk/company/broadwick
+    scan_method: websearch
+    scan_query: 'site:builtinlondon.uk/job Broadwick'
+    notes: "Drumsheds, Printworks, festivals. Jobs found via Built In London."
+    enabled: true
+
+  - name: Fever
+    careers_url: https://builtinlondon.uk/company/fever/jobs
+    scan_method: websearch
+    scan_query: 'site:builtinlondon.uk/job Fever London'
+    notes: "Live experiences platform with a London office. Jobs found via Built In London."
+    enabled: true
+
+  # -- Exhibitions, conferences & venues --
+
+  - name: Informa
+    careers_url: https://careers.smartrecruiters.com/InformaGroupPlc
+    notes: "Exhibitions and events organiser, London HQ. SmartRecruiters board."
+    enabled: true
+
+  - name: Clarion Events
+    careers_url: https://clarionevents.com/careers
+    notes: "Exhibitions organiser, London HQ (Fulham). Branded page, agent scan only."
+    enabled: true
+
+  - name: Freeman
+    careers_url: https://www.freeman.com/careers/
+    notes: "Event and exhibition production. Applications through SuccessFactors."
+    enabled: true
+
+  - name: NEC Group
+    careers_url: https://careers.thenec.co.uk/
+    notes: "NEC, Resorts World Arena and other Birmingham venues. Branded page, agent scan only."
+    enabled: true
+
+  # -- Event hospitality & catering --
+
+  - name: Compass Group UK (Levy, Restaurant Associates)
+    careers_url: https://jobs.compass-group.co.uk/
+    notes: "Large board covering Levy UK and other event hospitality brands. The title filter drops kitchen roles."
+    enabled: true
+
+  - name: Sodexo UK (Sodexo Live!)
+    careers_url: https://www.sodexojobs.co.uk/
+    notes: "Large board including Sodexo Live! events hospitality. The title filter drops kitchen roles."
+    enabled: true
+
+  - name: Searcys
+    careers_url: https://searcys.co.uk/
+    scan_method: websearch
+    scan_query: 'site:searcys.co.uk/job "Event" OR "Sales" London'
+    notes: "London venues and events catering. Job pages found by web search."
+    enabled: true
